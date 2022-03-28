@@ -13,7 +13,8 @@
   boot.loader.grub.enable = true;
   boot.loader.grub.version = 2;
   boot.loader.grub.useOSProber = true;
-  # boot.loader.grub.efiSupport = true;
+  boot.cleanTmpDir = true;
+ # boot.loader.grub.efiSupport = true;
   # boot.loader.grub.efiInstallAsRemovable = true;
   # boot.loader.efi.efiSysMountPoint = "/boot/efi";
   # Define on which hard drive you want to install Grub.
@@ -30,6 +31,10 @@
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+#  networking.extraHosts =
+#  ''
+#  192.168.0.103  us.download.nvidia.com
+#  '';
 
   # Select internationalisation properties.
    i18n.defaultLocale = "en_US.UTF-8";
@@ -77,6 +82,7 @@
      wget
      firefox
      nano
+     google-chrome
   ];
   hardware.opengl.enable = true;
   hardware.opengl.driSupport32Bit = true;
@@ -87,8 +93,8 @@
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia.modesetting.enable = true;
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_340;
-  boot.kernelPackages = pkgs.linuxKernel.packages.linux_5_4; 
-
+  boot.kernelPackages = pkgs.linuxKernel.packages.linux_5_16; 
+  programs.steam.enable = true;
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -107,6 +113,36 @@
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
+
+
+
+
+
+
+   nixpkgs.overlays = [
+ (
+self: super: {
+   google-chrome = super.google-chrome.override {
+     commandLineArgs =
+     "--in-process-gpu --enable-gpu --enable-features=VaapiVideoEncoder,VaapiVideoDecoder,CanvasOopRasterizatio> --ignore-gpu-blocklist -use-gl=desktop";
+   };
+})
+
+
+ ];
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

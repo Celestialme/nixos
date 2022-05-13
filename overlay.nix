@@ -25,7 +25,9 @@ self: super: {
 
 });
 
-
+linux_5_17 = super.linuxKernel.packages.linux_5_17.extend (kself: ksuper: {
+  nvidia_340_5_17 = super.dontRecurseIntoAttrs (super.lib.makeExtensible (_: ksuper.callPackage /home/nvidia-x11 { }));
+});
 
 
 }

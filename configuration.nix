@@ -2,9 +2,9 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
-
-{
+{ config, pkgs,options, ... }:
+let nv =import  /nix/store/zplbvvh8zbsp15l3j7nfjlb9b8azjdk6-nvidia-x11-340.108-5.17.5.drv;
+in{
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
@@ -46,7 +46,7 @@
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
-
+  services.xserver.serverFlagsSection = '' Option  "IgnoreABI" "true" '';    
   # Enable the Plasma 5 Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
   services.xserver.desktopManager.plasma5.enable = true;
@@ -80,21 +80,22 @@
    environment.systemPackages = with pkgs; [
   #   vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
      wget
-     firefox
+     #firefox
      nano
-     google-chrome
+     #google-chrome
   ];
+  
   hardware.opengl.enable = true;
   hardware.opengl.driSupport32Bit = true;
   hardware.opengl.setLdLibraryPath = true;
+  hardware.opengl.extraPackages = [ pkgs.libvdpau-va-gl pkgs.vaapiVdpau  ];
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.allowBroken = true;
   hardware.nvidia.nvidiaSettings = true;
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia.modesetting.enable = true;
-  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_340;
-  boot.kernelPackages = pkgs.linuxKernel.packages.linux_5_16; 
-  programs.steam.enable = true;
+  hardware.nvidia.package =pkgs.patch_5_17.nvidia_340;
+  boot.kernelPackages = pkgs.linuxKernel.packages.linux_5_17; 
+ # programs.steam.enable = true;
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -120,11 +121,14 @@
 
 
    nixpkgs.overlays = [
+ (import /etc/nixos/overlays/overlay.nix)
+
  (
 self: super: {
    google-chrome = super.google-chrome.override {
      commandLineArgs =
-     "--in-process-gpu --enable-gpu --enable-features=VaapiVideoEncoder,VaapiVideoDecoder,CanvasOopRasterizatio> --ignore-gpu-blocklist -use-gl=desktop";
+     "--in-process-gpu --enable-gpu --enable-features=VaapiVideoEncoder,VaapiVideoDecoder,CanvasOopRasterization --ignore-gpu-blocklist -use-gl=desktop --enable-gpu-rasterization --enable-oop-rasterization   --enable-accelerated-video-decode --enable-zero-copy";
+
    };
 })
 
@@ -134,7 +138,12 @@ self: super: {
 
 
 
-
+#  nix.nixPath =
+#    # Prepend default nixPath values.
+#    options.nix.nixPath.default ++
+#    # Append our nixpkgs-overlays.
+#    [ "nixpkgs-overlays=/etc/nixos/overlays" ]
+#  ;
 
 
 

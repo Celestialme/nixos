@@ -3,12 +3,12 @@ let
 
   # Please keep the version x.y.0.z and do not update to x.y.76.z because the
   # source of the latter disappears much faster.
-  version = "12.0.0";
+  version = "0.1.0";
 
-  src = ././nixos-gui_0.0.1_amd64.deb;
+  src = ./nixos-gui_0.1.0_amd64.deb;
 
 in stdenv.mkDerivation {
-  name = "wolframscript-${version}";
+  name = "Nixos_Gui-${version}";
 
   system = "x86_64-linux";
 

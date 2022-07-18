@@ -1,0 +1,35 @@
+
+sudo apt install squashfs-tools
+mkdir -p nixos/nix
+#wget 'https://channels.nixos.org/nixos-21.11/latest-nixos-minimal-x86_64-linux.iso'
+
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1U827ENOU6DWrJds9pEEyrTUHZSKySTWB' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1U827ENOU6DWrJds9pEEyrTUHZSKySTWB" -O "latest-nixos-minimal-x86_64-linux.iso" && rm -rf /tmp/cookies.txt
+
+
+7z x latest-nixos-minimal-x86_64-linux.iso
+unsquashfs -d nixos/nix/store nix-store.squashfs '*'
+
+
+
+mkdir -p nixos/etc nixos/dev nixos/proc nixos/sys
+cp /etc/resolv.conf nixos/etc
+for fn in /dev /proc /sys; do mount --bind "/${fn}" "nixos/${fn}"; done
+
+#mkdir -p nixos/nix/var/nix/profiles/per-user/root/channels/
+mkdir -p nixos/root/channels
+git clone https://github.com/NixOS/nixpkgs.git --depth 1 --branch nixos-unstable nixos/root/channels/nixos
+
+cd nixos
+export INIT=$(find ./nix -type f -path '*nixos*/init')
+export BASH=$(find ./nix -type f -path '*/bin/bash' | tail -n 1)
+
+chroot . $INIT
+chroot . $BASH
+
+#echo 'with import <nixpkgs>{}; [gcc rustc rustfmt cargo cargo-edit rust-analyzer ]' > /tmp/tmp.nix && nix-env -i -f /tmp/tmp.nix --option sandbox false
+#echo 'with import <nixpkgs>{}; [nodejs glib openssl gtk3 webkitgtk pkgconfig librsvg ]' > /tmp/tmp.nix && nix-env -i -f /tmp/tmp.nix --option sandbox false
+#curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+#git clone https://github.com/Celestialme/Nixos-Gui.git --depth 1 --branch full /content/nixos/home/nixos/backend
+#ln -s /root/channels /nix/var/nix/profiles/per-user/root/
+
+#wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1IwsEGKaQfNJk5a67Z3mM_C5bTD-LKr7B' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1IwsEGKaQfNJk5a67Z3mM_C5bTD-LKr7B" -O "rusting.zip" && rm -rf /tmp/cookies.txt

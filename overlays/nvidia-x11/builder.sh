@@ -16,6 +16,7 @@ buildPhase() {
     if [ -n "$bin" ]; then
         # Create the module.
         echo "Building linux driver against kernel: $kernel";
+        CFLAGS="-fcommon"
         cd kernel
         unset src # used by the nv makefile
         make $makeFlags -j $NIX_BUILD_CORES module

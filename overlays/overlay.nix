@@ -19,7 +19,7 @@ self: super: {
   '';
 });
 
-patch_5_17 = super.linuxKernel.packages.linux_5_17.extend (kself: ksuper: {
+patch_5_18 = super.linuxKernel.packages.linux_5_18.extend (kself: ksuper: {
   nvidia_340 = (super.dontRecurseIntoAttrs (super.lib.makeExtensible (_: ksuper.callPackage /etc/nixos/overlays/nvidia-x11 { })).legacy_340);
 });
 
